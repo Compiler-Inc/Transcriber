@@ -230,11 +230,7 @@ struct SensitiveConfig: SpeechRecognitionConfiguration {
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Author
-
-Compiler Inc.
+This project is licensed under the MIT License
 
 ## Contributing
 
