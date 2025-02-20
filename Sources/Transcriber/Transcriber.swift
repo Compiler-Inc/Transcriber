@@ -56,7 +56,7 @@ public actor Transcriber {
         self.speechRecognizer = recognizer
         self.audioEngine = AVAudioEngine()
         self.config = config
-        self.logger = DebugLogger(.speechRecognition, isEnabled: debugLogging)
+        self.logger = DebugLogger(.transcriber, isEnabled: debugLogging)
         
         if let customModel = config.customModel {
             logger.debug("Initializing with custom model: \(customModel.url.lastPathComponent)")
@@ -175,7 +175,7 @@ public actor Transcriber {
     
     /// Start a stream of speech recognition results
     /// - Returns: An async throwing stream of transcribed text
-    /// - Throws: SpeechRecognitionError if setup or recognition fails
+    /// - Throws: TranscriberError if setup or recognition fails
     public func startRecordingStream() async throws -> AsyncThrowingStream<String, Error> {
         logger.debug("Starting recording stream")
         

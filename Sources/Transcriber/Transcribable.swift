@@ -48,17 +48,17 @@ public protocol Transcribable {
     func toggleRecording()
     
     /// Request authorization for speech recognition
-    /// - Throws: SpeechRecognitionError if authorization fails or service is nil
+    /// - Throws: TranscriberError if authorization fails or service is nil
     ///
     /// Recommended implementation:
     /// ```swift
     /// func requestAuthorization() async throws {
     ///     guard let speechService else {
-    ///         throw SpeechRecognitionError.noRecognizer
+    ///         throw TranscribernError.noRecognizer
     ///     }
     ///     authStatus = await speechService.requestAuthorization()
     ///     guard authStatus == .authorized else {
-    ///         throw SpeechRecognitionError.notAuthorized
+    ///         throw TranscriberError.notAuthorized
     ///     }
     /// }
     /// ```

@@ -27,14 +27,14 @@ Add the following to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/Compiler-Inc/Transcriber.git", from: "0.1.0")
+    .package(url: "https://github.com/Compiler-Inc/Transcriber.git", from: "0.1.1")
 ]
 ```
 
 Or in Xcode:
 1. File > Add Packages...
-2. Enter `https://github.com/Compiler-Inc/SpeechRecognitionService.git`
-3. Select "Up to Next Major Version" with "0.1.0"
+2. Enter `https://github.com/Compiler-Inc/Transcriber.git`
+3. Select "Up to Next Major Version" with "0.1.1"
 
 ### Privacy Keys
 

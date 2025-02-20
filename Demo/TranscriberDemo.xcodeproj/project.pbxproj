@@ -75,7 +75,7 @@
 				C446613C2D67DEE60007F7EF /* Transcriber */,
 				C44661482D67DF280007F7EF /* Transcriber */,
 			);
-			productName = SpeechRecognitionDemo;
+			productName = TranscriberDemo;
 			productReference = 6B9D518B2D66A1040007B84B /* TranscriberDemo.app */;
 			productType = "com.apple.product-type.application";
 		};

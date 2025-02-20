@@ -6,7 +6,7 @@ extension Logger {
     private static let subsystem = "CompilerSwiftAI"
     
     /// Logs related to speech recognition operations and events
-    static let speechRecognition = Logger(subsystem: subsystem, category: "speechRecognition")
+    static let transcriber = Logger(subsystem: subsystem, category: "transcriber")
 }
 
 /// A wrapper around Logger that handles debug mode checks
