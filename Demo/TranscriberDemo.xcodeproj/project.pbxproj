@@ -72,7 +72,6 @@
 			);
 			name = TranscriberDemo;
 			packageProductDependencies = (
-				6B9D51A82D66A14C0007B84B /* SpeechRecognitionService */,
 				C446613C2D67DEE60007F7EF /* Transcriber */,
 				C44661482D67DF280007F7EF /* Transcriber */,
 			);
@@ -365,10 +364,6 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		6B9D51A82D66A14C0007B84B /* SpeechRecognitionService */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = SpeechRecognitionService;
-		};
 		C446613C2D67DEE60007F7EF /* Transcriber */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Transcriber;

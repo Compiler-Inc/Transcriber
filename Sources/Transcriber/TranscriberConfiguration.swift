@@ -99,7 +99,7 @@ public extension TranscriberConfiguration {
 /// This configuration provides reasonable defaults for testing speech recognition
 /// without requiring extensive customization. It can be used as a starting point
 /// for more specific configurations.
-public struct DefaultSpeechConfig: TranscriberConfiguration {
+public struct DefaultTranscriberConfig: TranscriberConfiguration {
     public let appIdentifier = "com.test.speech"
     public var silenceThreshold: Float = 0.001
     public var silenceDuration: TimeInterval = 2.0

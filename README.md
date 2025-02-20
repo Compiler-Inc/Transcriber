@@ -1,4 +1,4 @@
-# SpeechRecognitionService
+# Transcriber
 
 A modern, Swift-native wrapper around Apple's `Speech` framework and `SFSpeechRecognizer` that provides an actor-based interface for speech recognition with automatic silence detection and custom language model support.
 
@@ -27,14 +27,14 @@ Add the following to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/Compiler-Inc/SpeechRecognitionService.git", from: "1.0.0")
+    .package(url: "https://github.com/Compiler-Inc/Transcriber.git", from: "0.1.0")
 ]
 ```
 
 Or in Xcode:
 1. File > Add Packages...
 2. Enter `https://github.com/Compiler-Inc/SpeechRecognitionService.git`
-3. Select "Up to Next Major Version" with "1.0.0"
+3. Select "Up to Next Major Version" with "0.1.0"
 
 ### Privacy Keys
 
@@ -62,12 +62,12 @@ The simplest way to use the service is with the default configuration:
 ```swift
 func startRecording() async throws {
     // Initialize with default configuration
-    let service = SpeechRecognitionService(config: DefaultSpeechConfig())
+    let service = Transcriber(config: DefaultTranscriberConfig())
     
     // Request authorization
     let status = await service.requestAuthorization()
     guard status == .authorized else {
-        throw SpeechRecognitionError.notAuthorized
+        throw TranscriberError.notAuthorized
     }
     
     // Start recording and receive transcriptions
@@ -80,10 +80,10 @@ func startRecording() async throws {
 
 ### Configuration Options
 
-The service is highly configurable through the `SpeechRecognitionConfiguration` protocol:
+The service is highly configurable through the `TranscriberConfiguration` protocol:
 
 ```swift
-struct MyConfig: SpeechRecognitionConfiguration {
+struct MyConfig: TranscriberConfiguration {
     // Required
     let appIdentifier: String = "com.myapp.speech"
     
@@ -112,33 +112,33 @@ For SwiftUI applications, we provide a protocol-based MVVM pattern:
 // 1. Create your view model
 @Observable
 @MainActor
-class MySpeechViewModel: SpeechRecognizable {
+class MyViewModel: Transcribable {
     public var isRecording = false
     public var transcribedText = ""
     public var authStatus: SFSpeechRecognizerAuthorizationStatus = .notDetermined
     public var error: Error?
     
-    public let speechService: SpeechRecognitionService?
+    public let transcriber: Transcriber?
     private var recordingTask: Task<Void, Never>?
     
     init() {
-        self.speechService = SpeechRecognitionService(config: DefaultSpeechConfig())
+        self.transcriber = Transcriber(config: DefaultTranscriberConfig())
     }
     
     // Required protocol methods
     public func requestAuthorization() async throws {
-        guard let speechService else {
-            throw SpeechRecognitionError.noRecognizer
+        guard let transcriber else {
+            throw TrannscriberError.noRecognizer
         }
-        authStatus = await speechService.requestAuthorization()
+        authStatus = await transcriber.requestAuthorization()
         guard authStatus == .authorized else {
-            throw SpeechRecognitionError.notAuthorized
+            throw TranscriberError.notAuthorized
         }
     }
     
     public func toggleRecording() {
-        guard let speechService else {
-            error = SpeechRecognitionError.noRecognizer
+        guard let transcriber else {
+            error = TranscriberError.noRecognizer
             return
         }
         
@@ -150,7 +150,7 @@ class MySpeechViewModel: SpeechRecognizable {
             recordingTask = Task {
                 do {
                     isRecording = true
-                    let stream = try await speechService.startRecordingStream()
+                    let stream = try await transcriber.startRecordingStream()
                     
                     for try await transcription in stream {
                         transcribedText = transcription
@@ -167,7 +167,7 @@ class MySpeechViewModel: SpeechRecognizable {
 }
 // 2. Use in your SwiftUI view
 struct MySpeechView: View {
-    @State private var viewModel = MySpeechViewModel()
+    @State private var viewModel = MyViewModel()
     
     var body: some View {
         VStack {
@@ -196,7 +196,7 @@ struct MySpeechView: View {
 Enable detailed logging for debugging:
 
 ```swift
-let service = SpeechRecognitionService(
+let transcriber = Transcriber(
     config: config,
     debugLogging: true
 )
@@ -211,7 +211,7 @@ let model = CustomModel(
     url: modelURL,
     version: "2.0-beta"
 )
-let config = DefaultSpeechConfig(customModel: model)
+let config = DefaultTranscriberConfig(customModel: model)
 ```
 
 You can easily build `SFCustomLanguageModelData` models with our [SpeechModelBuilder CLI Tool](https://github.com/Compiler-Inc/SpeechModelBuilder)
@@ -221,7 +221,7 @@ You can easily build `SFCustomLanguageModelData` models with our [SpeechModelBui
 Automatic silence detection using RMS power analysis with configurable threshold and duration:
 
 ```swift
-struct SensitiveConfig: SpeechRecognitionConfiguration {
+struct SensitiveConfig: TranscriberConfiguration {
     var silenceThreshold: Float = 0.001  // Very sensitive
     var silenceDuration: TimeInterval = 2.0  // Longer confirmation
     // ... other properties
