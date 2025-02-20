@@ -6,19 +6,19 @@ import Speech
 
 // Example usage in view
 struct ContentView: View {
-    @State private var viewModel = DefaultSpeechViewModel()
+    @State private var model = TranscriptionModel()
     
     var body: some View {
         VStack {
-            Text(viewModel.transcribedText.isEmpty ? "No transcription yet" : viewModel.transcribedText)
+            Text(model.transcribedText.isEmpty ? "No transcription yet" : model.transcribedText)
                 .padding()
             
-            Button(viewModel.isRecording ? "Stop Recording" : "Start Recording") {
-                viewModel.toggleRecording()
+            Button(model.isRecording ? "Stop Recording" : "Start Recording") {
+                model.toggleRecording()
             }
-            .disabled(viewModel.authStatus != .authorized)
+            .disabled(model.authStatus != .authorized)
             
-            if let error = viewModel.error {
+            if let error = model.error {
                 Text(error.localizedDescription)
                     .foregroundColor(.red)
                     .padding()

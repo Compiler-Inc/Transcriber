@@ -4,7 +4,7 @@ import Foundation
 import Speech
 
 /// Errors that can occur during speech recognition operations
-public enum SpeechRecognitionError: LocalizedError {
+public enum TranscriberError: LocalizedError {
     /// Speech recognition authorization was denied or restricted
     case notAuthorized
     /// No speech recognizer available for the specified locale

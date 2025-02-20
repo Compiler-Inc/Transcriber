@@ -25,7 +25,7 @@ public struct CustomModel: Sendable {
 /// This protocol provides a comprehensive set of configuration options for speech recognition,
 /// including both core settings and recognition request settings. Default implementations
 /// are provided for most properties to allow for minimal configuration when using standard settings.
-@preconcurrency public protocol SpeechRecognitionConfiguration: Sendable {
+@preconcurrency public protocol TranscriberConfiguration: Sendable {
     // MARK: - Core Settings
     
     /// The locale to use for speech recognition
@@ -68,7 +68,7 @@ public struct CustomModel: Sendable {
 
 // MARK: - Default Implementations
 
-public extension SpeechRecognitionConfiguration {
+public extension TranscriberConfiguration {
     /// Default locale is US English
     var locale: Locale { Locale(identifier: "en-US") }
     
@@ -99,7 +99,7 @@ public extension SpeechRecognitionConfiguration {
 /// This configuration provides reasonable defaults for testing speech recognition
 /// without requiring extensive customization. It can be used as a starting point
 /// for more specific configurations.
-public struct DefaultSpeechConfig: SpeechRecognitionConfiguration {
+public struct DefaultSpeechConfig: TranscriberConfiguration {
     public let appIdentifier = "com.test.speech"
     public var silenceThreshold: Float = 0.001
     public var silenceDuration: TimeInterval = 2.0

@@ -3,7 +3,7 @@
 import SwiftUI
 
 @main
-struct SpeechRecognitionDemoApp: App {
+struct TranscriberDemoApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()

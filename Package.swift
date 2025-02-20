@@ -3,12 +3,8 @@
 import PackageDescription
 
 let package = Package(
-    name: "SpeechRecognitionService",
+    name: "Transcriber",
     platforms: [.macOS(.v14), .iOS(.v17), .tvOS(.v17), .visionOS(.v1)],
-    products: [
-        .library(
-            name: "SpeechRecognitionService",
-            targets: ["SpeechRecognitionService"]),
-    ],
-    targets: [.target(name: "SpeechRecognitionService")]
+    products: [.library(name: "Transcriber", targets: ["Transcriber"])],
+    targets: [.target(name: "Transcriber")]
 )

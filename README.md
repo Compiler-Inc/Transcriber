@@ -112,7 +112,7 @@ For SwiftUI applications, we provide a protocol-based MVVM pattern:
 // 1. Create your view model
 @Observable
 @MainActor
-class MySpeechViewModel: SpeechRecognitionManaging {
+class MySpeechViewModel: SpeechRecognizable {
     public var isRecording = false
     public var transcribedText = ""
     public var authStatus: SFSpeechRecognizerAuthorizationStatus = .notDetermined

@@ -8,16 +8,17 @@
 
 /* Begin PBXBuildFile section */
 		6B9D51A92D66A14C0007B84B /* SpeechRecognitionService in Frameworks */ = {isa = PBXBuildFile; productRef = 6B9D51A82D66A14C0007B84B /* SpeechRecognitionService */; };
+		C44661262D67DBE90007F7EF /* Transcribe in Frameworks */ = {isa = PBXBuildFile; productRef = C44661252D67DBE90007F7EF /* Transcribe */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		6B9D518B2D66A1040007B84B /* SpeechRecognitionDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpeechRecognitionDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6B9D518B2D66A1040007B84B /* TranscriberDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TranscriberDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		6B9D518D2D66A1040007B84B /* SpeechRecognitionDemo */ = {
+		6B9D518D2D66A1040007B84B /* TranscriberDemo */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = SpeechRecognitionDemo;
+			path = TranscriberDemo;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -28,6 +29,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6B9D51A92D66A14C0007B84B /* SpeechRecognitionService in Frameworks */,
+				C44661262D67DBE90007F7EF /* Transcribe in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -37,7 +39,7 @@
 		6B9D51822D66A1040007B84B = {
 			isa = PBXGroup;
 			children = (
-				6B9D518D2D66A1040007B84B /* SpeechRecognitionDemo */,
+				6B9D518D2D66A1040007B84B /* TranscriberDemo */,
 				6B9D518C2D66A1040007B84B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -45,7 +47,7 @@
 		6B9D518C2D66A1040007B84B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6B9D518B2D66A1040007B84B /* SpeechRecognitionDemo.app */,
+				6B9D518B2D66A1040007B84B /* TranscriberDemo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -53,9 +55,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		6B9D518A2D66A1040007B84B /* SpeechRecognitionDemo */ = {
+		6B9D518A2D66A1040007B84B /* TranscriberDemo */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6B9D519A2D66A1040007B84B /* Build configuration list for PBXNativeTarget "SpeechRecognitionDemo" */;
+			buildConfigurationList = 6B9D519A2D66A1040007B84B /* Build configuration list for PBXNativeTarget "TranscriberDemo" */;
 			buildPhases = (
 				6B9D51872D66A1040007B84B /* Sources */,
 				6B9D51882D66A1040007B84B /* Frameworks */,
@@ -66,14 +68,15 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				6B9D518D2D66A1040007B84B /* SpeechRecognitionDemo */,
+				6B9D518D2D66A1040007B84B /* TranscriberDemo */,
 			);
-			name = SpeechRecognitionDemo;
+			name = TranscriberDemo;
 			packageProductDependencies = (
 				6B9D51A82D66A14C0007B84B /* SpeechRecognitionService */,
+				C44661252D67DBE90007F7EF /* Transcribe */,
 			);
 			productName = SpeechRecognitionDemo;
-			productReference = 6B9D518B2D66A1040007B84B /* SpeechRecognitionDemo.app */;
+			productReference = 6B9D518B2D66A1040007B84B /* TranscriberDemo.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -91,7 +94,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 6B9D51862D66A1040007B84B /* Build configuration list for PBXProject "SpeechRecognitionDemo" */;
+			buildConfigurationList = 6B9D51862D66A1040007B84B /* Build configuration list for PBXProject "TranscriberDemo" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -101,14 +104,14 @@
 			mainGroup = 6B9D51822D66A1040007B84B;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				6B9D51A72D66A14C0007B84B /* XCLocalSwiftPackageReference "../../SpeechRecognitionService" */,
+				C44661242D67DBE90007F7EF /* XCLocalSwiftPackageReference "../../SpeechRecognitionService" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6B9D518C2D66A1040007B84B /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				6B9D518A2D66A1040007B84B /* SpeechRecognitionDemo */,
+				6B9D518A2D66A1040007B84B /* TranscriberDemo */,
 			);
 		};
 /* End PBXProject section */
@@ -253,10 +256,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = SpeechRecognitionDemo/SpeechRecognitionDemo.entitlements;
+				CODE_SIGN_ENTITLEMENTS = TranscriberDemo/TranscriberDemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"SpeechRecognitionDemo/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"TranscriberDemo/Preview Content\"";
 				DEVELOPMENT_TEAM = UNPG3B9P9H;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -278,7 +281,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = asw.SpeechRecognitionDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = asw.TranscriberDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -294,10 +297,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = SpeechRecognitionDemo/SpeechRecognitionDemo.entitlements;
+				CODE_SIGN_ENTITLEMENTS = TranscriberDemo/TranscriberDemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"SpeechRecognitionDemo/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"TranscriberDemo/Preview Content\"";
 				DEVELOPMENT_TEAM = UNPG3B9P9H;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -319,7 +322,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = asw.SpeechRecognitionDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = asw.TranscriberDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -333,7 +336,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		6B9D51862D66A1040007B84B /* Build configuration list for PBXProject "SpeechRecognitionDemo" */ = {
+		6B9D51862D66A1040007B84B /* Build configuration list for PBXProject "TranscriberDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6B9D51982D66A1040007B84B /* Debug */,
@@ -342,7 +345,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6B9D519A2D66A1040007B84B /* Build configuration list for PBXNativeTarget "SpeechRecognitionDemo" */ = {
+		6B9D519A2D66A1040007B84B /* Build configuration list for PBXNativeTarget "TranscriberDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6B9D519B2D66A1040007B84B /* Debug */,
@@ -354,7 +357,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		6B9D51A72D66A14C0007B84B /* XCLocalSwiftPackageReference "../../SpeechRecognitionService" */ = {
+		C44661242D67DBE90007F7EF /* XCLocalSwiftPackageReference "../../SpeechRecognitionService" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../../SpeechRecognitionService;
 		};
@@ -364,6 +367,10 @@
 		6B9D51A82D66A14C0007B84B /* SpeechRecognitionService */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SpeechRecognitionService;
+		};
+		C44661252D67DBE90007F7EF /* Transcribe */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Transcribe;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

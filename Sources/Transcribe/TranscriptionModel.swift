@@ -5,33 +5,33 @@ import Speech
 
 @Observable
 @MainActor
-public class DefaultSpeechViewModel: SpeechRecognitionManaging {
+public class TranscriptionModel: Transcribable {
     
     public var isRecording = false
     public var transcribedText = ""
     public var authStatus: SFSpeechRecognizerAuthorizationStatus = .notDetermined
     public var error: Error?
     
-    public let speechService: SpeechRecognitionService?
+    public let speechService: Transcriber?
     private var recordingTask: Task<Void, Never>?
     
-    public init(config: SpeechRecognitionConfiguration = DefaultSpeechConfig()) {
-        self.speechService = SpeechRecognitionService(config: config)
+    public init(config: TranscriberConfiguration = DefaultSpeechConfig()) {
+        self.speechService = Transcriber(config: config)
     }
     
     public func requestAuthorization() async throws {
         guard let speechService else {
-            throw SpeechRecognitionError.noRecognizer
+            throw TranscriberError.noRecognizer
         }
         authStatus = await speechService.requestAuthorization()
         guard authStatus == .authorized else {
-            throw SpeechRecognitionError.notAuthorized
+            throw TranscriberError.notAuthorized
         }
     }
     
     public func toggleRecording() {
         guard let speechService else {
-            error = SpeechRecognitionError.noRecognizer
+            error = TranscriberError.noRecognizer
             return
         }
         

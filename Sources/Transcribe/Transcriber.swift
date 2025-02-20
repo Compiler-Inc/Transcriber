@@ -6,7 +6,7 @@ import Accelerate
 import OSLog
 
 // MARK: - SilenceState Extension
-extension SpeechRecognitionService {
+extension Transcriber {
     fileprivate struct SilenceState {
         var isSilent: Bool = false
         var startTime: CFAbsoluteTime = 0
@@ -31,9 +31,9 @@ extension SpeechRecognitionService {
 
 // MARK: - Speech Recognition Service
 /// An actor that manages speech recognition operations using Apple's Speech framework
-public actor SpeechRecognitionService {
+public actor Transcriber {
     // MARK: - Properties
-    private let config: SpeechRecognitionConfiguration
+    private let config: TranscriberConfiguration
     private let speechRecognizer: SFSpeechRecognizer
     private let audioEngine: AVAudioEngine
     private var hasBuiltLm = false
@@ -51,7 +51,7 @@ public actor SpeechRecognitionService {
     /// - Parameters:
     ///   - config: Configuration for speech recognition behavior and settings
     ///   - debugLogging: Enable detailed debug logging (defaults to false)
-    public init?(config: SpeechRecognitionConfiguration, debugLogging: Bool = false) {
+    public init?(config: TranscriberConfiguration, debugLogging: Bool = false) {
         guard let recognizer = SFSpeechRecognizer(locale: config.locale) else { return nil }
         self.speechRecognizer = recognizer
         self.audioEngine = AVAudioEngine()
@@ -93,7 +93,7 @@ public actor SpeechRecognitionService {
                 self.logger.debug("Custom model preparation completed")
             } catch {
                 self.logger.error("Custom model preparation failed: \(error.localizedDescription)")
-                throw SpeechRecognitionError.customModelFailure(error)
+                throw TranscriberError.customModelFailure(error)
             }
         }
     }
@@ -156,7 +156,7 @@ public actor SpeechRecognitionService {
             }
             if let error {
                 self?.logger.error("Recognition error: \(error.localizedDescription)")
-                continuation.finish(throwing: SpeechRecognitionError.recognitionFailure(error))
+                continuation.finish(throwing: TranscriberError.recognitionFailure(error))
             } else if result?.isFinal == true {
                 self?.logger.debug("Recognition completed")
                 continuation.finish()
@@ -232,7 +232,7 @@ public actor SpeechRecognitionService {
             logger.debug("Audio engine started")
         } catch {
             logger.error("Audio engine start failed: \(error.localizedDescription)")
-            throw SpeechRecognitionError.engineFailure(error)
+            throw TranscriberError.engineFailure(error)
         }
 
         // Create and return stream
