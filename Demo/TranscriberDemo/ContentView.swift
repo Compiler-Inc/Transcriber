@@ -1,8 +1,8 @@
 //  Copyright © 2025 Compiler, Inc. All rights reserved.
 
 import SwiftUI
-import SpeechRecognitionService
 import Speech
+import Transcriber
 
 // Example usage in view
 struct ContentView: View {
@@ -27,7 +27,7 @@ struct ContentView: View {
         .padding()
         .task {
             do {
-                try await viewModel.requestAuthorization()
+                try await model.requestAuthorization()
             } catch {
                 print(error.localizedDescription)
             }

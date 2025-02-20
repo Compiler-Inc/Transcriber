@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6B9D51A92D66A14C0007B84B /* SpeechRecognitionService in Frameworks */ = {isa = PBXBuildFile; productRef = 6B9D51A82D66A14C0007B84B /* SpeechRecognitionService */; };
-		C44661262D67DBE90007F7EF /* Transcribe in Frameworks */ = {isa = PBXBuildFile; productRef = C44661252D67DBE90007F7EF /* Transcribe */; };
+		C446613D2D67DEE60007F7EF /* Transcriber in Frameworks */ = {isa = PBXBuildFile; productRef = C446613C2D67DEE60007F7EF /* Transcriber */; };
+		C44661492D67DF280007F7EF /* Transcriber in Frameworks */ = {isa = PBXBuildFile; productRef = C44661482D67DF280007F7EF /* Transcriber */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,8 +28,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6B9D51A92D66A14C0007B84B /* SpeechRecognitionService in Frameworks */,
-				C44661262D67DBE90007F7EF /* Transcribe in Frameworks */,
+				C44661492D67DF280007F7EF /* Transcriber in Frameworks */,
+				C446613D2D67DEE60007F7EF /* Transcriber in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -73,7 +73,8 @@
 			name = TranscriberDemo;
 			packageProductDependencies = (
 				6B9D51A82D66A14C0007B84B /* SpeechRecognitionService */,
-				C44661252D67DBE90007F7EF /* Transcribe */,
+				C446613C2D67DEE60007F7EF /* Transcriber */,
+				C44661482D67DF280007F7EF /* Transcriber */,
 			);
 			productName = SpeechRecognitionDemo;
 			productReference = 6B9D518B2D66A1040007B84B /* TranscriberDemo.app */;
@@ -104,7 +105,7 @@
 			mainGroup = 6B9D51822D66A1040007B84B;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				C44661242D67DBE90007F7EF /* XCLocalSwiftPackageReference "../../SpeechRecognitionService" */,
+				C446613B2D67DEE60007F7EF /* XCLocalSwiftPackageReference "../../Transcriber" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6B9D518C2D66A1040007B84B /* Products */;
@@ -357,9 +358,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		C44661242D67DBE90007F7EF /* XCLocalSwiftPackageReference "../../SpeechRecognitionService" */ = {
+		C446613B2D67DEE60007F7EF /* XCLocalSwiftPackageReference "../../Transcriber" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../SpeechRecognitionService;
+			relativePath = ../../Transcriber;
 		};
 /* End XCLocalSwiftPackageReference section */
 
@@ -368,9 +369,13 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = SpeechRecognitionService;
 		};
-		C44661252D67DBE90007F7EF /* Transcribe */ = {
+		C446613C2D67DEE60007F7EF /* Transcriber */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = Transcribe;
+			productName = Transcriber;
+		};
+		C44661482D67DF280007F7EF /* Transcriber */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Transcriber;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
