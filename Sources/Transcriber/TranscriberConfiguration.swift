@@ -2,97 +2,74 @@
 
 import Speech
 
-/// Protocol defining the configuration options for speech recognition
-///
-/// This protocol provides a comprehensive set of configuration options for speech recognition,
-/// including both core settings and recognition request settings. Default implementations
-/// are provided for most properties to allow for minimal configuration when using standard settings.
-@preconcurrency public protocol TranscriberConfiguration: Sendable {
-    // MARK: - Core Settings
-    
-    /// The locale to use for speech recognition
-    var locale: Locale { get }
-    
-    /// The RMS threshold below which audio is considered silence
-    /// Values typically range from 0.0 to 1.0, with lower values being more sensitive
-    var silenceThreshold: Float { get }
-    
-    /// The duration of silence required to end recognition
-    /// Specified in seconds
-    var silenceDuration: TimeInterval { get }
-    
-    /// A unique identifier for your app, used for custom model management
-    var appIdentifier: String { get }
-    
-    /// Optional custom language model configuration
-    var languageModelInfo: LanguageModelInfo? { get }
-    
-    // MARK: - Recognition Request Settings
-    
-    /// Whether recognition must be performed on-device
-    /// Note: This is automatically set to true when using a custom model
-    var requiresOnDeviceRecognition: Bool { get }
-    
-    /// Whether to return partial recognition results as they become available
-    var shouldReportPartialResults: Bool { get }
-    
-    /// Optional array of strings that should be recognized even if not in system vocabulary
-    /// Useful for domain-specific terms or proper nouns
-    var contextualStrings: [String]? { get }
-    
-    /// The type of speech recognition task being performed
-    /// This helps the recognizer optimize for different types of speech
-    var taskHint: SFSpeechRecognitionTaskHint { get }
-    
-    /// Whether to automatically add punctuation to recognition results
-    var addsPunctuation: Bool { get }
-}
-
-// MARK: - Default Implementations
-
-public extension TranscriberConfiguration {
-    /// Default locale is US English
-    var locale: Locale { Locale(identifier: "en-US") }
-    
-    /// Default silence threshold is very sensitive
-    var silenceThreshold: Float { 0.001 }
-    
-    /// Default silence duration is 1.5 seconds
-    var silenceDuration: TimeInterval { 1.5 }
-    
-    /// Default to allowing server-side recognition
-    var requiresOnDeviceRecognition: Bool { false }
-    
-    /// Default to providing partial results for better user experience
-    var shouldReportPartialResults: Bool { true }
-    
-    /// No contextual strings by default
-    var contextualStrings: [String]? { nil }
-    
-    /// Default to unspecified task hint, letting the recognizer decide
-    var taskHint: SFSpeechRecognitionTaskHint { .unspecified }
-    
-    /// Default to adding punctuation for better readability
-    var addsPunctuation: Bool { true }
-}
-
 /// A basic configuration implementation for testing purposes
 ///
 /// This configuration provides reasonable defaults for testing speech recognition
 /// without requiring extensive customization. It can be used as a starting point
 /// for more specific configurations.
-public struct DefaultTranscriberConfig: TranscriberConfiguration {
-    public let appIdentifier = "com.test.speech"
-    public var silenceThreshold: Float = 0.001
-    public var silenceDuration: TimeInterval = 2.0
-    public var languageModelInfo: LanguageModelInfo? = nil
+public struct TranscriberConfiguration: Sendable {
+    /// The locale to use for speech recognition
+    public let locale: Locale
     
-    // Only override defaults if needed for testing
-    public var requiresOnDeviceRecognition: Bool = false
-    public var shouldReportPartialResults: Bool = true
-    public var contextualStrings: [String]? = nil
-    public var taskHint: SFSpeechRecognitionTaskHint = .unspecified
-    public var addsPunctuation: Bool = true
+    /// The RMS threshold below which audio is considered silence
+    /// Values typically range from 0.0 to 1.0, with lower values being more sensitive
+    /// Default silence threshold is very sensitive
+    public let silenceThreshold: Float
     
-    public init() {}
+    /// The duration of silence required to end recognition
+    /// Specified in seconds (default 1.5)
+    public let silenceDuration: TimeInterval
+    
+    /// A unique identifier for your app, used for custom model management
+    public let appIdentifier: String
+    
+    public let languageModelInfo: LanguageModelInfo?
+    
+    /// Whether recognition must be performed on-device
+    /// Note: This is automatically set to true when using a custom model
+    /// Default to allowing server-side recognition
+    public let requiresOnDeviceRecognition: Bool
+    
+    /// Whether to return partial recognition results as they become available
+    /// Default to providing partial results for better user experience
+    public let shouldReportPartialResults: Bool
+    
+    /// Optional array of strings that should be recognized even if not in system vocabulary
+    /// Useful for domain-specific terms or proper nouns
+    /// No contextual strings by default
+    public let contextualStrings: [String]?
+    
+    /// The type of speech recognition task being performed
+    /// This helps the recognizer optimize for different types of speech
+    /// Default to unspecified task hint, letting the recognizer decide
+    public let taskHint: SFSpeechRecognitionTaskHint
+    
+    /// Whether to automatically add punctuation to recognition results
+    /// Default to adding punctuation for better readability
+    public let addsPunctuation: Bool
+
+    /// Creates a new TranscriberConfiguration with default values
+    public init(
+        locale: Locale = Locale(identifier: "en-US"),
+        silenceThreshold: Float = 0.001,
+        silenceDuration: TimeInterval = 1.5,
+        appIdentifier: String = "com.test.speech",
+        languageModelInfo: LanguageModelInfo? = nil,
+        requiresOnDeviceRecognition: Bool = false,
+        shouldReportPartialResults: Bool = true,
+        contextualStrings: [String]? = nil,
+        taskHint: SFSpeechRecognitionTaskHint = .unspecified,
+        addsPunctuation: Bool = true
+    ) {
+        self.locale = locale
+        self.silenceThreshold = silenceThreshold
+        self.silenceDuration = silenceDuration
+        self.appIdentifier = appIdentifier
+        self.languageModelInfo = languageModelInfo
+        self.requiresOnDeviceRecognition = requiresOnDeviceRecognition
+        self.shouldReportPartialResults = shouldReportPartialResults
+        self.contextualStrings = contextualStrings
+        self.taskHint = taskHint
+        self.addsPunctuation = addsPunctuation
+    }
 }

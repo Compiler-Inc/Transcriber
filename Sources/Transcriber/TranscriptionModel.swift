@@ -15,7 +15,7 @@ public class TranscriptionModel: Transcribable {
     public let transcriber: Transcriber?
     private var recordingTask: Task<Void, Never>?
     
-    public init(config: TranscriberConfiguration = DefaultTranscriberConfig()) {
+    public init(config: TranscriberConfiguration = TranscriberConfiguration()) {
         self.transcriber = Transcriber(config: config)
     }
     

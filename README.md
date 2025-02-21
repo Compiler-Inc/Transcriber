@@ -62,7 +62,7 @@ The simplest way to use the service is with the default configuration:
 ```swift
 func startRecording() async throws {
     // Initialize with default configuration
-    let transcriber = Transcriber(config: DefaultTranscriberConfig())
+    let transcriber = Transcriber()
     
     // Request authorization
     let status = await transcriber.requestAuthorization()
@@ -122,7 +122,7 @@ class MyViewModel: Transcribable {
     private var recordingTask: Task<Void, Never>?
     
     init() {
-        self.transcriber = Transcriber(config: DefaultTranscriberConfig())
+        self.transcriber = Transcriber()
     }
     
     // Required protocol methods
@@ -196,7 +196,7 @@ struct MySpeechView: View {
 Enable detailed logging for debugging:
 
 ```swift
-let transcriber = Transcriber(config: config, debugLogging: true)
+let transcriber = Transcriber(debugLogging: true)
 ```
 
 ### Custom Language Models
@@ -205,7 +205,7 @@ Support for custom language models with version tracking:
 
 ```swift
 let model = LanguageModelInfo(url: modelURL,version: "2.0-beta")
-let config = DefaultTranscriberConfig(languageModelInfo: model)
+let config = TranscriberConfiguration(languageModelInfo: model)
 ```
 
 You can easily build `SFCustomLanguageModelData` models with our [SpeechModelBuilder CLI Tool](https://github.com/Compiler-Inc/SpeechModelBuilder)

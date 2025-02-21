@@ -51,7 +51,7 @@ public actor Transcriber {
     /// - Parameters:
     ///   - config: Configuration for speech recognition behavior and settings
     ///   - debugLogging: Enable detailed debug logging (defaults to false)
-    public init?(config: TranscriberConfiguration = DefaultTranscriberConfig(), debugLogging: Bool = false) {
+    public init?(config: TranscriberConfiguration = TranscriberConfiguration(), debugLogging: Bool = false) {
         guard let recognizer = SFSpeechRecognizer(locale: config.locale) else { return nil }
         self.speechRecognizer = recognizer
         self.audioEngine = AVAudioEngine()
