@@ -196,10 +196,7 @@ struct MySpeechView: View {
 Enable detailed logging for debugging:
 
 ```swift
-let transcriber = Transcriber(
-    config: config,
-    debugLogging: true
-)
+let transcriber = Transcriber(config: config, debugLogging: true)
 ```
 
 ### Custom Language Models
