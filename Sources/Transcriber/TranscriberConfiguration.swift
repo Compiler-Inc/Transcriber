@@ -8,6 +8,9 @@ import Speech
 /// without requiring extensive customization. It can be used as a starting point
 /// for more specific configurations.
 public struct TranscriberConfiguration: Sendable {
+    /// A unique identifier for your app, used for custom model management
+    public let appIdentifier: String
+
     /// The locale to use for speech recognition
     public let locale: Locale
     
@@ -19,9 +22,6 @@ public struct TranscriberConfiguration: Sendable {
     /// The duration of silence required to end recognition
     /// Specified in seconds (default 1.5)
     public let silenceDuration: TimeInterval
-    
-    /// A unique identifier for your app, used for custom model management
-    public let appIdentifier: String
     
     public let languageModelInfo: LanguageModelInfo?
     
@@ -50,10 +50,10 @@ public struct TranscriberConfiguration: Sendable {
 
     /// Creates a new TranscriberConfiguration with default values
     public init(
+        appIdentifier: String = "com.test.speech",
         locale: Locale = Locale(identifier: "en-US"),
         silenceThreshold: Float = 0.001,
         silenceDuration: TimeInterval = 1.5,
-        appIdentifier: String = "com.test.speech",
         languageModelInfo: LanguageModelInfo? = nil,
         requiresOnDeviceRecognition: Bool = false,
         shouldReportPartialResults: Bool = true,

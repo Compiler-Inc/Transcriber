@@ -80,28 +80,21 @@ func startRecording() async throws {
 
 ### Configuration Options
 
-The service is highly configurable through the `TranscriberConfiguration` protocol:
+The service is highly configurable through defining your own `TranscriberConfiguration`.
 
 ```swift
-struct MyConfig: TranscriberConfiguration {
-    // Required
-    let appIdentifier: String = "com.myapp.speech"
-    
-    // Speech Recognition Settings
-    var locale: Locale = .current                     // Recognition language
-    var requiresOnDeviceRecognition: Bool = false    // Force on-device processing
-    var shouldReportPartialResults: Bool = true      // Get results as they're processed
-    var addsPunctuation: Bool = true                 // Automatic punctuation
-    var taskHint: SFSpeechRecognitionTaskHint = .unspecified  // Optimize for specific speech types
-    var contextualStrings: [String]? = ["Custom", "Words"]    // Improve recognition of specific terms
-    
-    // Silence Detection
-    var silenceThreshold: Float = 0.001      // RMS power threshold (0.0 to 1.0)
-    var silenceDuration: TimeInterval = 1.5   // Duration of silence before stopping
-    
-    // Custom Language Model (Optional)
-    var languageModelInfo: LanguageModelInfo? = nil       // For domain-specific recognition
-}
+    let myConfig = TranscriberConfiguration(
+        appIdentifier: "com.myapp.speech",
+        locale: .current,                       // Recognition language
+        silenceThreshold: 0.01,                 // RMS power threshold (0.0 to 1.0)
+        silenceDuration: 2,                     // Duration of silence before stopping
+        languageModelInfo: nil,                 // For domain-specific recognition
+        requiresOnDeviceRecognition: false,     // Force on-device processing
+        shouldReportPartialResults: true,       // Get results as they're processed
+        contextualStrings: ["Custom", "Words"], // Improve recognition of specific terms
+        taskHint: .unspecified,                 // Optimize for specific speech types
+        addsPunctuation: true                   // Automatic punctuation
+    )    
 ```
 
 ### Using in SwiftUI
