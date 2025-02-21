@@ -1,24 +1,6 @@
 //  Copyright © 2025 Compiler, Inc. All rights reserved.
 
-import Foundation
 import Speech
-
-/// A model for configuring custom language models in speech recognition
-public struct CustomModel: Sendable {
-    /// The URL to the custom language model file
-    public let url: URL
-    /// Optional version identifier for the model, useful for tracking different model versions
-    public let version: String?
-    
-    /// Initialize a new custom model configuration
-    /// - Parameters:
-    ///   - url: The URL to the custom language model file
-    ///   - version: Optional version identifier for the model
-    public init(url: URL, version: String? = nil) {
-        self.url = url
-        self.version = version
-    }
-}
 
 /// Protocol defining the configuration options for speech recognition
 ///
@@ -43,7 +25,7 @@ public struct CustomModel: Sendable {
     var appIdentifier: String { get }
     
     /// Optional custom language model configuration
-    var customModel: CustomModel? { get }
+    var languageModelInfo: LanguageModelInfo? { get }
     
     // MARK: - Recognition Request Settings
     
@@ -103,7 +85,7 @@ public struct DefaultTranscriberConfig: TranscriberConfiguration {
     public let appIdentifier = "com.test.speech"
     public var silenceThreshold: Float = 0.001
     public var silenceDuration: TimeInterval = 2.0
-    public var customModel: CustomModel? = nil
+    public var languageModelInfo: LanguageModelInfo? = nil
     
     // Only override defaults if needed for testing
     public var requiresOnDeviceRecognition: Bool = false

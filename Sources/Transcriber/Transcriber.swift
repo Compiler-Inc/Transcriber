@@ -58,11 +58,11 @@ public actor Transcriber {
         self.config = config
         self.logger = DebugLogger(.transcriber, isEnabled: debugLogging)
         
-        if let customModel = config.customModel {
-            logger.debug("Initializing with custom model: \(customModel.url.lastPathComponent)")
-            self.lmConfiguration = SFSpeechLanguageModel.Configuration(languageModel: customModel.url)
+        if let languageModelInfo = config.languageModelInfo {
+            logger.debug("Initializing with custom model: \(languageModelInfo.url.lastPathComponent)")
+            self.lmConfiguration = SFSpeechLanguageModel.Configuration(languageModel: languageModelInfo.url)
             Task {
-                await self.prepareCustomModel(modelURL: customModel.url)
+                await self.prepareCustomModel(modelURL: languageModelInfo.url)
             }
         }
 
@@ -93,7 +93,7 @@ public actor Transcriber {
                 self.logger.debug("Custom model preparation completed")
             } catch {
                 self.logger.error("Custom model preparation failed: \(error.localizedDescription)")
-                throw TranscriberError.customModelFailure(error)
+                throw TranscriberError.customLanguageModelFailure(error)
             }
         }
     }

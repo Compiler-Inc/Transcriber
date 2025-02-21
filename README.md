@@ -100,7 +100,7 @@ struct MyConfig: TranscriberConfiguration {
     var silenceDuration: TimeInterval = 1.5   // Duration of silence before stopping
     
     // Custom Language Model (Optional)
-    var customModel: CustomModel? = nil       // For domain-specific recognition
+    var languageModelInfo: LanguageModelInfo? = nil       // For domain-specific recognition
 }
 ```
 
@@ -207,11 +207,8 @@ let transcriber = Transcriber(
 Support for custom language models with version tracking:
 
 ```swift
-let model = CustomModel(
-    url: modelURL,
-    version: "2.0-beta"
-)
-let config = DefaultTranscriberConfig(customModel: model)
+let model = LanguageModelInfo(url: modelURL,version: "2.0-beta")
+let config = DefaultTranscriberConfig(languageModelInfo: model)
 ```
 
 You can easily build `SFCustomLanguageModelData` models with our [SpeechModelBuilder CLI Tool](https://github.com/Compiler-Inc/SpeechModelBuilder)

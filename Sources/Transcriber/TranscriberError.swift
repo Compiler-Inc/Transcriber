@@ -14,7 +14,7 @@ public enum TranscriberError: LocalizedError {
     /// Recognition task encountered an error
     case recognitionFailure(Error)
     /// Custom language model failed to load or prepare
-    case customModelFailure(Error)
+    case customLanguageModelFailure(Error)
     /// Audio session setup failed (iOS only)
     case audioSessionFailure(Error)
     /// Recognition request could not be created or configured
@@ -30,8 +30,8 @@ public enum TranscriberError: LocalizedError {
             return "Audio engine error: \(error.localizedDescription)"
         case .recognitionFailure(let error):
             return "Recognition error: \(error.localizedDescription)"
-        case .customModelFailure(let error):
-            return "Custom model error: \(error.localizedDescription)"
+        case .customLanguageModelFailure(let error):
+            return "Custom language model error: \(error.localizedDescription)"
         case .audioSessionFailure(let error):
             return "Audio session error: \(error.localizedDescription)"
         case .invalidRequest:
