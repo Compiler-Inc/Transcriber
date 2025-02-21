@@ -62,16 +62,16 @@ The simplest way to use the service is with the default configuration:
 ```swift
 func startRecording() async throws {
     // Initialize with default configuration
-    let service = Transcriber(config: DefaultTranscriberConfig())
+    let transcriber = Transcriber(config: DefaultTranscriberConfig())
     
     // Request authorization
-    let status = await service.requestAuthorization()
+    let status = await transcriber.requestAuthorization()
     guard status == .authorized else {
         throw TranscriberError.notAuthorized
     }
     
     // Start recording and receive transcriptions
-    let stream = try await service.startRecordingStream()
+    let stream = try await transcriber.startRecordingStream()
     for try await transcription in stream {
         print("Transcribed text: \(transcription)")
     }

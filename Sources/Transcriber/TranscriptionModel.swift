@@ -12,25 +12,25 @@ public class TranscriptionModel: Transcribable {
     public var authStatus: SFSpeechRecognizerAuthorizationStatus = .notDetermined
     public var error: Error?
     
-    public let speechService: Transcriber?
+    public let transcriber: Transcriber?
     private var recordingTask: Task<Void, Never>?
     
     public init(config: TranscriberConfiguration = DefaultTranscriberConfig()) {
-        self.speechService = Transcriber(config: config)
+        self.transcriber = Transcriber(config: config)
     }
     
     public func requestAuthorization() async throws {
-        guard let speechService else {
+        guard let transcriber else {
             throw TranscriberError.noRecognizer
         }
-        authStatus = await speechService.requestAuthorization()
+        authStatus = await transcriber.requestAuthorization()
         guard authStatus == .authorized else {
             throw TranscriberError.notAuthorized
         }
     }
     
     public func toggleRecording() {
-        guard let speechService else {
+        guard let transcriber else {
             error = TranscriberError.noRecognizer
             return
         }
@@ -43,7 +43,7 @@ public class TranscriptionModel: Transcribable {
             recordingTask = Task {
                 do {
                     isRecording = true
-                    let stream = try await speechService.startRecordingStream()
+                    let stream = try await transcriber.startRecordingStream()
                     
                     for try await transcription in stream {
                         transcribedText = transcription

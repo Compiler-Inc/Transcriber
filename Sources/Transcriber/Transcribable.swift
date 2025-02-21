@@ -28,19 +28,17 @@ public protocol Transcribable {
     /// Any error that occurred during speech recognition
     /// Should be displayed to the user in the view
     var error: Error? { get set }
-    
-    // MARK: - Required Service
-    
+        
     /// The underlying speech recognition service
     /// May be nil if initialization failed (e.g., unsupported locale)
-    var speechService: Transcriber? { get }
+    var transcriber: Transcriber? { get }
     
     // MARK: - Required Methods
     
     /// Toggles the speech recognition state between recording and not recording
     ///
     /// This method should:
-    /// 1. Handle the case where speechService is nil
+    /// 1. Handle the case where transcriber is nil
     /// 2. Cancel any existing recording if isRecording is true
     /// 3. Start a new recording if isRecording is false
     /// 4. Update isRecording status appropriately
@@ -48,15 +46,15 @@ public protocol Transcribable {
     func toggleRecording()
     
     /// Request authorization for speech recognition
-    /// - Throws: TranscriberError if authorization fails or service is nil
+    /// - Throws: TranscriberError if authorization fails or transcriber is nil
     ///
     /// Recommended implementation:
     /// ```swift
     /// func requestAuthorization() async throws {
-    ///     guard let speechService else {
+    ///     guard let transcriber else {
     ///         throw TranscribernError.noRecognizer
     ///     }
-    ///     authStatus = await speechService.requestAuthorization()
+    ///     authStatus = await transcriber.requestAuthorization()
     ///     guard authStatus == .authorized else {
     ///         throw TranscriberError.notAuthorized
     ///     }

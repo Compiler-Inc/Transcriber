@@ -47,7 +47,7 @@ public actor Transcriber {
     
     // MARK: - Initialization
     
-    /// Initialize a new speech recognition service
+    /// Initialize a new transcriber
     /// - Parameters:
     ///   - config: Configuration for speech recognition behavior and settings
     ///   - debugLogging: Enable detailed debug logging (defaults to false)
