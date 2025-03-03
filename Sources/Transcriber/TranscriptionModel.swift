@@ -11,9 +11,11 @@ public class TranscriptionModel: Transcribable {
     public var transcribedText = ""
     public var authStatus: SFSpeechRecognizerAuthorizationStatus = .notDetermined
     public var error: Error?
+    public var rmsLevel: Float = 0
     
     public let transcriber: Transcriber?
     private var recordingTask: Task<Void, Never>?
+    
     
     public init(config: TranscriberConfiguration = TranscriberConfiguration()) {
         self.transcriber = Transcriber(config: config)
@@ -43,10 +45,15 @@ public class TranscriptionModel: Transcribable {
             recordingTask = Task {
                 do {
                     isRecording = true
-                    let stream = try await transcriber.startRecordingStream()
+                    let stream = try await transcriber.startStream()
                     
-                    for try await transcription in stream {
-                        transcribedText = transcription
+                    for try await signal in stream {
+                        switch signal {
+                            case .rms(let float):
+                                rmsLevel = float
+                            case .transcription(let string):
+                                transcribedText = string
+                        }
                     }
                     
                     isRecording = false
