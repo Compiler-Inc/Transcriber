@@ -5,6 +5,25 @@ import AVFoundation
 import Accelerate
 import OSLog
 
+// MARK: - TranscriberSignal Enum
+/// Signal types emitted by the Transcriber's unified stream
+///
+/// This enum represents the two types of data that can be emitted by the Transcriber:
+/// - Audio level data (RMS values) for visualizing microphone input
+/// - Transcription text from speech recognition
+///
+/// Use with `startStream()` to receive both types of data in a single stream.
+public enum TranscriberSignal: Sendable {
+    /// An audio level measurement (Root Mean Square)
+    /// - Parameter Float: A value between 0.0 and 1.0 representing the audio level
+    case rms(Float)
+    
+    /// A transcription result from speech recognition
+    /// - Parameter String: The transcribed text
+    case transcription(String)
+}
+
+
 // MARK: - SilenceState Extension
 extension Transcriber {
     fileprivate struct SilenceState {
@@ -42,6 +61,10 @@ public actor Transcriber {
     
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
+    
+    // RMS streaming support
+    private var rmsStream: AsyncStream<Float>?
+    private var rmsContinuation: AsyncStream<Float>.Continuation?
     
     private let logger: DebugLogger
     
@@ -171,12 +194,28 @@ public actor Transcriber {
         recognitionTask = nil
     }
 
+    // MARK: - RMS Stream Management
+    /// Creates a new RMS stream for audio level monitoring
+    /// - Returns: An AsyncStream of Float values representing audio RMS levels
+    private func createRMSStream() -> AsyncStream<Float> {
+        logger.debug("Creating RMS stream")
+        
+        // Clean up any existing stream
+        rmsContinuation?.finish()
+        rmsContinuation = nil
+        
+        // Create a new stream with continuation
+        return AsyncStream { continuation in
+            self.rmsContinuation = continuation
+        }
+    }
+
     // MARK: - Public Interface
     
     /// Start a stream of speech recognition results
     /// - Returns: An async throwing stream of transcribed text
     /// - Throws: TranscriberError if setup or recognition fails
-    public func startRecordingStream() async throws -> AsyncThrowingStream<String, Error> {
+    private func startRecordingStream() async throws -> AsyncThrowingStream<String, Error> {
         logger.debug("Starting recording stream")
         
         // Wait for model
@@ -198,6 +237,10 @@ public actor Transcriber {
         // Create local silence state
         var silenceState = SilenceState()
         
+        // Create RMS stream and capture continuation locally
+        rmsStream = createRMSStream()
+        let localRMSContinuation = rmsContinuation
+        
         // Install tap
         inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { [weak self] buffer, _ in
             guard let self = self else { return }
@@ -208,6 +251,9 @@ public actor Transcriber {
             
             self.logger.debug("Current RMS: \(rms)")
             
+            // Send RMS value to stream using local continuation
+            localRMSContinuation?.yield(rms)
+            
             if silenceState.update(
                 rms: rms,
                 currentTime: currentTime,
@@ -217,7 +263,7 @@ public actor Transcriber {
                 self.logger.debug("Silence detected, ending audio")
                 localRequest.endAudio()
                 Task { @MainActor in
-                    await self.stopRecording()
+                    await self.stopStream()
                 }
                 return
             }
@@ -242,12 +288,81 @@ public actor Transcriber {
     }
 
     /// Stop the current recording session
-    public func stopRecording() {
+    public func stopStream() {
         logger.debug("Stopping recording")
         audioEngine.stop()
         audioEngine.inputNode.removeTap(onBus: 0)
 
+        // Clean up RMS stream
+        rmsContinuation?.finish()
+        rmsContinuation = nil
+        rmsStream = nil
+
         recognitionTask = nil
         recognitionRequest = nil
+    }
+
+    // For backward compatibility
+    @available(*, deprecated, renamed: "stopStream")
+    public func stopRecording() {
+        stopStream()
+    }
+    
+    /// Start a stream that provides both transcription and RMS values in a unified stream
+    /// 
+    /// This method returns a single stream that emits both transcription text and audio level (RMS) values
+    /// as they become available. The stream emits values as `TranscriberSignal` enum cases:
+    /// 
+    /// - `.transcription(String)`: Contains the latest transcribed text from speech recognition
+    /// - `.rms(Float)`: Contains the latest Root Mean Square audio level (0.0-1.0) for visualizing audio input
+    ///
+    /// Example usage:
+    /// ```swift
+    /// let stream = try await transcriber.startStream()
+    /// for await signal in stream {
+    ///     switch signal {
+    ///     case .transcription(let text):
+    ///         // Update UI with transcribed text
+    ///         updateTranscriptionLabel(text)
+    ///     case .rms(let level):
+    ///         // Update audio visualization
+    ///         updateAudioLevelIndicator(level)
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// - Returns: An AsyncStream of TranscriberSignal values containing either transcription or RMS data
+    /// - Throws: TranscriberError if setup or recognition fails
+    public func startStream() async throws -> AsyncStream<TranscriberSignal> {
+        // Start the transcription stream
+        let transcriptionStream = try await startRecordingStream()
+        
+        // Create a combined stream
+        return AsyncStream<TranscriberSignal> { continuation in
+            // Task for handling transcription values
+            Task {
+                do {
+                    for try await transcription in transcriptionStream {
+                        continuation.yield(.transcription(transcription))
+                    }
+                } catch {
+                    logger.error("Transcription stream error: \(error.localizedDescription)")
+                    // We don't finish the continuation here as RMS might still be active
+                }
+                // When transcription ends naturally, we don't finish the stream
+                // as RMS values might still be coming
+            }
+            
+            // Task for handling RMS values
+            if let rmsStream = self.rmsStream {
+                Task {
+                    for await rms in rmsStream {
+                        continuation.yield(.rms(rms))
+                    }
+                    // When RMS stream ends, we can finish the combined stream
+                    continuation.finish()
+                }
+            }
+        }
     }
 }
