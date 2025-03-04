@@ -88,16 +88,6 @@ public actor Transcriber {
                 await self.prepareCustomModel(modelURL: languageModelInfo.url)
             }
         }
-
-        #if !os(macOS)
-        let audioSession = AVAudioSession.sharedInstance()
-        do {
-            try audioSession.setCategory(.playAndRecord, mode: .measurement, options: .duckOthers)
-            try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
-        } catch {
-            logger.error("Audio session setup failed: \(error.localizedDescription)")
-        }
-        #endif
     }
     
     // MARK: - Custom Model Management
