@@ -69,7 +69,7 @@ public actor Transcriber {
         #if !os(macOS)
         let audioSession = AVAudioSession.sharedInstance()
         do {
-            try audioSession.setCategory(.record, mode: .measurement, options: .duckOthers)
+            try audioSession.setCategory(.playAndRecord, mode: .measurement, options: .duckOthers)
             try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
         } catch {
             logger.error("Audio session setup failed: \(error.localizedDescription)")
