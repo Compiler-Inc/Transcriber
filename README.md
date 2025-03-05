@@ -71,7 +71,7 @@ func startRecording() async throws {
     }
     
     // Start recording and receive transcriptions
-    let stream = try await transcriber.startRecordingStream()
+    let stream = try await transcriber.startStream()
     for try await transcription in stream {
         print("Transcribed text: \(transcription)")
     }
@@ -108,6 +108,7 @@ For SwiftUI applications, we provide a protocol-based MVVM pattern:
 class MyViewModel: Transcribable {
     public var isRecording = false
     public var transcribedText = ""
+    public var rmsLevel: Float = 0
     public var authStatus: SFSpeechRecognizerAuthorizationStatus = .notDetermined
     public var error: Error?
     
@@ -145,8 +146,13 @@ class MyViewModel: Transcribable {
                     isRecording = true
                     let stream = try await transcriber.startRecordingStream()
                     
-                    for try await transcription in stream {
-                        transcribedText = transcription
+                    for try await signal in stream {
+                        switch signal {
+                            case .rms(let float):
+                                rmsLevel = float
+                            case .transcription(let string):
+                                transcribedText = string
+                        }
                     }
                     
                     isRecording = false
