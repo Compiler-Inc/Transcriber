@@ -13,11 +13,17 @@ struct ContentView: View {
             Text(model.transcribedText.isEmpty ? "No transcription yet" : model.transcribedText)
                 .padding()
             
-            Button(model.isRecording ? "Stop Recording" : "Start Recording") {
-                model.toggleRecording()
-            }
+            SpeechButton(
+                isRecording: model.isRecording,
+                rmsValue: model.rmsLevel,
+                isProcessing: false,
+                supportsThinkingState: false,
+                onTap: {
+                    model.toggleRecording()
+                }
+            )
             .disabled(model.authStatus != .authorized)
-            
+
             if let error = model.error {
                 Text(error.localizedDescription)
                     .foregroundColor(.red)
