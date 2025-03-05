@@ -68,20 +68,29 @@ public struct SpeechButton: View {
     /// Whether the button is currently recording
     public var isRecording: Bool
     /// Current RMS (Root Mean Square) value for audio visualization
-    public var rmsValue: CGFloat
+    public var rmsValue: Float
     /// Whether an async operation is processing the audio
     public var isProcessing: Bool
-    /// Callback when the button is tapped
-    public var onTap: () -> Void
     /// Whether to show the thinking state (spinner) during processing
     public var supportsThinkingState: Bool = false
     /// Color configuration for the different button states
     public var colors: SpeechButtonColors = SpeechButtonColors()
+    /// Callback when the button is tapped
+    public var onTap: () -> Void
     
     // MARK: - Private State
     @State private var state: SpeechButtonState = .idle
     @State private var amplitudes: [CGFloat] = Array(repeating: 0, count: 10)
     @State private var animationTimer: AnyCancellable?
+    
+    public init(isRecording: Bool, rmsValue: Float, isProcessing: Bool, supportsThinkingState: Bool = false, colors: SpeechButtonColors = SpeechButtonColors(), onTap: @escaping () -> Void) {
+        self.isRecording = isRecording
+        self.rmsValue = rmsValue
+        self.isProcessing = isProcessing
+        self.supportsThinkingState = supportsThinkingState
+        self.colors = colors
+        self.onTap = onTap
+    }
     
     // MARK: - View Body
     public var body: some View {
@@ -176,7 +185,7 @@ public struct SpeechButton: View {
     
     /// Updates the waveform visualization with new audio level data
     /// - Parameter rms: Root Mean Square value of the audio input (0.0-1.0)
-    private func updateAmplitudes(with rms: CGFloat) {
+    private func updateAmplitudes(with rms: Float) {
         // Only update amplitudes when in listening state
         guard state == .listening else { return }
         
@@ -194,10 +203,10 @@ public struct SpeechButton: View {
         let exaggeratedRMS = pow(scaledRMS, 0.4)
         
         // Add some randomness to make it more lively (±15% variation)
-        let randomFactor = CGFloat.random(in: 0.85...1.15)
+        let randomFactor = Float.random(in: 0.85...1.15)
         let finalRMS = min(exaggeratedRMS * randomFactor, 1.0)
         
-        amplitudes[amplitudes.count - 1] = finalRMS
+        amplitudes[amplitudes.count - 1] = CGFloat(finalRMS)
     }
     
     /// Adds small random variations to the waveform to make it look more dynamic
