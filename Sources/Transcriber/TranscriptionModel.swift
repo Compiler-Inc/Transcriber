@@ -17,7 +17,7 @@ public class TranscriptionModel: Transcribable {
     private var recordingTask: Task<Void, Never>?
     
     
-    public init(config: TranscriberConfiguration = TranscriberConfiguration()) {
+    public init(config: TranscriberConfiguration = TranscriberConfiguration(silenceThreshold: 0.01)) {
         self.transcriber = Transcriber(config: config)
     }
     
@@ -41,6 +41,10 @@ public class TranscriptionModel: Transcribable {
             recordingTask?.cancel()
             recordingTask = nil
             isRecording = false
+            Task {
+                await transcriber.stopStream()
+                isRecording = false
+            }
         } else {
             recordingTask = Task {
                 do {
