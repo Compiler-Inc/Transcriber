@@ -1,4 +1,4 @@
-//  Copyright © 2025 Compiler, Inc. All rights reserved.
+//  Copyright 2025 Compiler, Inc. All rights reserved.
 
 import Speech
 import AVFoundation
@@ -222,7 +222,24 @@ public actor Transcriber {
         
         // Setup audio
         let inputNode = audioEngine.inputNode
-        let recordingFormat = inputNode.outputFormat(forBus: 0)
+        let inputFormat = inputNode.outputFormat(forBus: 0)
+        
+        // Create processing format for speech recognition (keep input sample rate)
+        let processingFormat = AVAudioFormat(
+            commonFormat: .pcmFormatFloat32,
+            sampleRate: inputFormat.sampleRate,
+            channels: 1,
+            interleaved: false)
+        
+        guard let processingFormat = processingFormat else {
+            throw TranscriberError.engineFailure(NSError(
+                domain: "Transcriber",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "Could not create processing format"]))
+        }
+        
+        // Add converter if needed
+        let converter = AVAudioConverter(from: inputFormat, to: processingFormat)
         
         // Create local silence state
         var silenceState = SilenceState()
@@ -231,8 +248,8 @@ public actor Transcriber {
         rmsStream = createRMSStream()
         let localRMSContinuation = rmsContinuation
         
-        // Install tap
-        inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { [weak self] buffer, _ in
+        // Install tap with input format
+        inputNode.installTap(onBus: 0, bufferSize: 1024, format: inputFormat) { [weak self] buffer, _ in
             guard let self = self else { return }
             guard !silenceState.hasEnded else { return }
             
@@ -258,7 +275,30 @@ public actor Transcriber {
                 return
             }
             
-            localRequest.append(buffer)
+            // Convert buffer if needed
+            if let converter = converter {
+                let frameCount = AVAudioFrameCount(buffer.frameLength)
+                guard let convertedBuffer = AVAudioPCMBuffer(
+                    pcmFormat: processingFormat,
+                    frameCapacity: frameCount)
+                else { return }
+                
+                var error: NSError?
+                let inputBlock: AVAudioConverterInputBlock = { inNumPackets, outStatus in
+                    outStatus.pointee = .haveData
+                    return buffer
+                }
+                
+                converter.convert(to: convertedBuffer,
+                                error: &error,
+                                withInputFrom: inputBlock)
+                
+                if error == nil {
+                    localRequest.append(convertedBuffer)
+                }
+            } else {
+                localRequest.append(buffer)
+            }
         }
 
         // Start audio engine
@@ -299,10 +339,10 @@ public actor Transcriber {
     }
     
     /// Start a stream that provides both transcription and RMS values in a unified stream
-    /// 
+    ///
     /// This method returns a single stream that emits both transcription text and audio level (RMS) values
     /// as they become available. The stream emits values as `TranscriberSignal` enum cases:
-    /// 
+    ///
     /// - `.transcription(String)`: Contains the latest transcribed text from speech recognition
     /// - `.rms(Float)`: Contains the latest Root Mean Square audio level (0.0-1.0) for visualizing audio input
     ///

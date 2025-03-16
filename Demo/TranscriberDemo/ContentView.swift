@@ -1,4 +1,4 @@
-//  Copyright © 2025 Compiler, Inc. All rights reserved.
+//  Copyright 2025 Compiler, Inc. All rights reserved.
 
 import SwiftUI
 import Speech
@@ -10,6 +10,19 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
+            // Add input selection picker
+            Picker("Audio Input", selection: Binding(
+                get: { model.selectedInput },
+                set: { if let input = $0 { model.selectInput(input) }}
+            )) {
+                ForEach(model.availableInputs, id: \.uid) { input in
+                    Text(input.portName)
+                        .tag(Optional(input))
+                }
+            }
+            .pickerStyle(.menu)
+            .padding()
+            
             Text(model.transcribedText.isEmpty ? "No transcription yet" : model.transcribedText)
                 .padding()
             
@@ -37,6 +50,10 @@ struct ContentView: View {
             } catch {
                 print(error.localizedDescription)
             }
+        }
+        // Add onAppear to refresh inputs when view appears
+        .onAppear {
+            model.fetchAvailableInputs()
         }
     }
 }

@@ -1,7 +1,8 @@
-//  Copyright © 2025 Compiler, Inc. All rights reserved.
+//  Copyright 2025 Compiler, Inc. All rights reserved.
 
 import Combine
 import Speech
+import AVFoundation
 
 @Observable
 @MainActor
@@ -16,9 +17,53 @@ public class TranscriptionModel: Transcribable {
     public let transcriber: Transcriber?
     private var recordingTask: Task<Void, Never>?
     
+    public var availableInputs: [AVAudioSessionPortDescription] = []
+    public var selectedInput: AVAudioSessionPortDescription?
     
     public init(config: TranscriberConfiguration = TranscriberConfiguration(silenceThreshold: 0.01)) {
-        self.transcriber = Transcriber(config: config)
+        self.transcriber = Transcriber(config: config, debugLogging: true)
+        self.setupAudioSession()
+        self.fetchAvailableInputs()
+    }
+    
+    private func setupAudioSession() {
+        do {
+            let session = AVAudioSession.sharedInstance()
+            // Configure for both playback and recording with all possible options
+            try session.setCategory(.playAndRecord, mode: .spokenAudio, options: [
+                .allowAirPlay,
+                .allowBluetooth,
+                .allowBluetoothA2DP,
+                .defaultToSpeaker
+            ])
+            // Set preferred sample rate for better speech recognition
+            try session.setPreferredSampleRate(44100.0)
+            // Set preferred I/O buffer duration
+            try session.setPreferredIOBufferDuration(0.005)
+            try session.setActive(true)
+        } catch {
+            fatalError("Error: \(error.localizedDescription)")
+        }
+    }
+    
+    public func fetchAvailableInputs() {
+        do {
+            availableInputs = AVAudioSession.sharedInstance().availableInputs ?? []
+        } catch {
+            print("Error fetching inputs: \(error.localizedDescription)")
+        }
+    }
+    
+    public func selectInput(_ input: AVAudioSessionPortDescription) {
+        do {
+            try AVAudioSession.sharedInstance().setPreferredInput(input)
+            if let dataSources = input.dataSources, let firstSource = dataSources.first {
+                try input.setPreferredDataSource(firstSource)
+            }
+            selectedInput = input
+        } catch {
+            print("Error selecting input: \(error.localizedDescription)")
+        }
     }
     
     public func requestAuthorization() async throws {
