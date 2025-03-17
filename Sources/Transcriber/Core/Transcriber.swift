@@ -143,6 +143,8 @@ public actor Transcriber {
             self.logger.debug("RMS: \(rms)")
             
             // Send RMS value to stream using local continuation
+            localRMSContinuation?.yield(rms) 
+            // Send RMS value to stream using local continuation
             if silenceState.update(
                 rms: rms,
                 currentTime: currentTime,

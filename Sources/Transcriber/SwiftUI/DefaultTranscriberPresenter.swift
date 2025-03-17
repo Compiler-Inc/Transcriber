@@ -76,6 +76,7 @@ public class DefaultTranscriberPresenter: TranscriberPresenter {
                     for try await signal in stream {
                         switch signal {
                         case .rms(let float):
+                                print("PRESENTER RMS: \(float)")
                             rmsLevel = float
                         case .transcription(let string):
                             transcribedText = string
