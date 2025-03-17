@@ -6,6 +6,8 @@ import Foundation
 public struct LanguageModelInfo: Sendable {
     /// The URL to the custom language model file
     public let url: URL
+    /// App Identifier
+    public let appIdentifier: String
     /// Optional version identifier for the model, useful for tracking different model versions
     public let version: String?
     
@@ -13,8 +15,9 @@ public struct LanguageModelInfo: Sendable {
     /// - Parameters:
     ///   - url: The URL to the custom language model file
     ///   - version: Optional version identifier for the model
-    public init(url: URL, version: String? = nil) {
+    public init(url: URL, appIdentifier: String = "com.test.speech", version: String? = nil) {
         self.url = url
+        self.appIdentifier = appIdentifier
         self.version = version
     }
 }

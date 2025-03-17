@@ -11,7 +11,7 @@ import Foundation
 ///
 @preconcurrency
 @MainActor
-public protocol TranscriberViewModeling {
+public protocol TranscriberPresenter {
     // MARK: - Required State Properties
     
     /// Indicates whether speech recognition is currently active
@@ -28,22 +28,22 @@ public protocol TranscriberViewModeling {
     /// Any error that occurred during speech recognition
     /// Should be displayed to the user in the view
     var error: Error? { get set }
-        
-    /// The underlying speech recognition service
-    /// May be nil if initialization failed (e.g., unsupported locale)
-    var transcriber: Transcriber? { get }
+    
+    /// Audio level for visualization (0.0 - 1.0)
+    var rmsLevel: Float { get set }
     
     // MARK: - Required Methods
     
-    /// Toggles the speech recognition state between recording and not recording
-    ///
+    /// Start/stop recording with optional completion handler
+    /// - Parameter onComplete: Handler called when recording stops (silence or manual)
     /// This method should:
     /// 1. Handle the case where transcriber is nil
     /// 2. Cancel any existing recording if isRecording is true
     /// 3. Start a new recording if isRecording is false
     /// 4. Update isRecording status appropriately
     /// 5. Handle any errors by setting the error property
-    func toggleRecording()
+    func toggleRecording(onComplete: ((String) -> Void)?)
+
     
     /// Request authorization for speech recognition
     /// - Throws: TranscriberError if authorization fails or transcriber is nil

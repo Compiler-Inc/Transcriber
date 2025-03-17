@@ -45,11 +45,9 @@ public actor LanguageModelManager {
         }
     }
     
-    /// Apply language model to recognition request if available
-    public func configureRequest(_ request: SFSpeechAudioBufferRecognitionRequest) {
-        if let lmConfiguration = lmConfiguration {
-            request.requiresOnDeviceRecognition = true
-            request.customizedLanguageModel = lmConfiguration
-        }
+    /// Get the current language model configuration
+    /// - Returns: The prepared language model configuration, if available
+    public func getConfiguration() -> SFSpeechLanguageModel.Configuration? {
+        return lmConfiguration
     }
 }

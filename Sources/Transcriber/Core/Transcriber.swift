@@ -6,10 +6,11 @@ import OSLog
 
 // MARK: - Speech Recognition Service
 /// An actor that manages speech recognition operations using Apple's Speech framework
-public actor TranscriberCore {
+public actor Transcriber {
     private let config: TranscriberConfiguration
     private let speechRecognizer: SFSpeechRecognizer
     private let audioEngine: AVAudioEngine
+    private let logger: DebugLogger
     
     private lazy var languageModelManager: LanguageModelManager? = {
         guard let modelInfo = config.languageModelInfo else { return nil }
@@ -18,6 +19,10 @@ public actor TranscriberCore {
     
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
+    
+    // RMS streaming support
+    private var rmsStream: AsyncStream<Float>?
+    private var rmsContinuation: AsyncStream<Float>.Continuation?
     
     public init?(config: TranscriberConfiguration = TranscriberConfiguration(), debugLogging: Bool = false) {
         guard let recognizer = SFSpeechRecognizer(locale: config.locale) else { return nil }
@@ -35,6 +40,7 @@ public actor TranscriberCore {
             }
         }
     }
+    
     
     // MARK: - Recognition Setup
     private func setupRecognition() throws -> SFSpeechAudioBufferRecognitionRequest {
@@ -57,6 +63,28 @@ public actor TranscriberCore {
         return request
     }
     
+    private func resetRecognitionState() {
+        logger.debug("Resetting recognition state")
+        recognitionTask?.cancel()
+        recognitionTask = nil
+    }
+    
+    // MARK: - RMS Stream Management
+    /// Creates a new RMS stream for audio level monitoring
+    /// - Returns: An AsyncStream of Float values representing audio RMS levels
+    private func createRMSStream() -> AsyncStream<Float> {
+        logger.debug("Creating RMS stream")
+        
+        // Clean up any existing stream
+        rmsContinuation?.finish()
+        rmsContinuation = nil
+        
+        // Create a new stream with continuation
+        return AsyncStream { continuation in
+            self.rmsContinuation = continuation
+        }
+    }
+    
     /// Start a stream of speech recognition results
     /// - Returns: An AsyncThrowingStream of transcribed text and RMS values
     /// - Throws: TranscriberError if setup or recognition fails
@@ -72,8 +100,14 @@ public actor TranscriberCore {
         
         let localRequest = try setupRecognition()
         
-        // Configure language model only if one exists
-        languageModelManager?.configureRequest(request)
+        // Configure language model if available
+        if let languageModel = languageModelManager {
+            try await languageModel.waitForModel()
+            if let lmConfig = await languageModel.getConfiguration() {
+                localRequest.requiresOnDeviceRecognition = true
+                localRequest.customizedLanguageModel = lmConfig
+            }
+        }
         
         let inputNode = audioEngine.inputNode
         let inputFormat = inputNode.outputFormat(forBus: 0)
@@ -82,6 +116,13 @@ public actor TranscriberCore {
             sampleRate: inputFormat.sampleRate,
             channels: 1,
             interleaved: false)
+        
+        // Create local silence state
+        var silenceState = SilenceState()
+        
+        // Create RMS stream and capture continuation locally
+        rmsStream = createRMSStream()
+        let localRMSContinuation = rmsContinuation
         
         guard let processingFormat = processingFormat else {
             throw TranscriberError.engineFailure(NSError(
@@ -95,7 +136,6 @@ public actor TranscriberCore {
         
         inputNode.installTap(onBus: 0, bufferSize: 1024, format: inputFormat) { [weak self] buffer, _ in
             guard let self = self else { return }
-            guard !silenceState.hasEnded else { return }
             
             let rms = buffer.calculateRMS()
             let currentTime = CFAbsoluteTimeGetCurrent()
@@ -103,7 +143,6 @@ public actor TranscriberCore {
             self.logger.debug("RMS: \(rms)")
             
             // Send RMS value to stream using local continuation
-            
             if silenceState.update(
                 rms: rms,
                 currentTime: currentTime,
@@ -160,6 +199,28 @@ public actor TranscriberCore {
         }
     }
     
+    // MARK: - Recognition Task Management
+    private func createRecognitionTask(
+        request: SFSpeechAudioBufferRecognitionRequest,
+        continuation: AsyncThrowingStream<String, Error>.Continuation
+    ) {
+        let task = speechRecognizer.recognitionTask(with: request) { [weak self] result, error in
+            if let result {
+                let transcription = result.bestTranscription.formattedString
+                self?.logger.debug("Transcription update: \(transcription)")
+                continuation.yield(transcription)
+            }
+            if let error {
+                self?.logger.error("Recognition error: \(error.localizedDescription)")
+                continuation.finish(throwing: TranscriberError.recognitionFailure(error))
+            } else if result?.isFinal == true {
+                self?.logger.debug("Recognition completed")
+                continuation.finish()
+            }
+        }
+        recognitionTask = task
+    }
+    
     /// Stop the current recording session
     public func stopStream() {
         logger.debug("Stopping recording")
@@ -202,7 +263,7 @@ public actor TranscriberCore {
     /// - Throws: TranscriberError if setup or recognition fails
     public func startStream() async throws -> AsyncStream<TranscriberSignal> {
         // Start the transcription stream
-        let transcriptionStream = try await startRecordingStream()
+        let transcriptionStream = try await startCombinedStream()
         
         // Create a combined stream
         return AsyncStream<TranscriberSignal> { continuation in
@@ -230,6 +291,30 @@ public actor TranscriberCore {
                     continuation.finish()
                 }
             }
+        }
+    }
+}
+
+// MARK: - SilenceState
+extension Transcriber {
+    internal struct SilenceState {
+        var isSilent: Bool = false
+        var startTime: CFAbsoluteTime = 0
+        var hasEnded: Bool = false
+        
+        mutating func update(rms: Float, currentTime: CFAbsoluteTime, threshold: Float, duration: TimeInterval) -> Bool {
+            if rms < threshold {
+                if !isSilent {
+                    isSilent = true
+                    startTime = currentTime
+                } else if !hasEnded && (currentTime - startTime) >= duration {
+                    hasEnded = true
+                    return true
+                }
+            } else {
+                isSilent = false
+            }
+            return false
         }
     }
 }

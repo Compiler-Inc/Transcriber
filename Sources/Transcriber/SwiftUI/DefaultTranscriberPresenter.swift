@@ -1,29 +1,35 @@
-//  Copyright 2025 Compiler, Inc. All rights reserved.
+//  Copyright © 2025 Compiler, Inc. All rights reserved.
 
-import Combine
 import Speech
 import AVFoundation
 
+/// Default implementation of SpeechRecognitionPresenter
+/// Provides ready-to-use speech recognition functionality for SwiftUI views
 @Observable
 @MainActor
-public class TranscriptionModel: TranscriberViewModeling {
-    
+public class DefaultTranscriberPresenter: TranscriberPresenter {
     public var isRecording = false
     public var transcribedText = ""
     public var authStatus: SFSpeechRecognizerAuthorizationStatus = .notDetermined
     public var error: Error?
     public var rmsLevel: Float = 0
     
-    public let transcriber: Transcriber?
+    private let transcriber: Transcriber?
     private var recordingTask: Task<Void, Never>?
+    private var onCompleteHandler: ((String) -> Void)?
     
+    #if os(iOS)
     public var availableInputs: [AVAudioSessionPortDescription] = []
     public var selectedInput: AVAudioSessionPortDescription?
+    #endif
     
-    public init(config: TranscriberConfiguration = TranscriberConfiguration(silenceThreshold: 0.01)) {
+    public init(config: TranscriberConfiguration = TranscriberConfiguration()) {
         self.transcriber = Transcriber(config: config, debugLogging: true)
-        self.setupAudioSession()
+        
+        #if os(iOS)
+        setupAudioSession()
         self.fetchAvailableInputs()
+        #endif
     }
     
     private func setupAudioSession() {
@@ -44,23 +50,46 @@ public class TranscriptionModel: TranscriberViewModeling {
         }
     }
     
-    public func fetchAvailableInputs() {
-        do {
-            availableInputs = AVAudioSession.sharedInstance().availableInputs ?? []
-        } catch {
-            print("Error fetching inputs: \(error.localizedDescription)")
+    public func toggleRecording(onComplete: ((String) -> Void)? = nil) {
+        self.onCompleteHandler = onComplete
+        
+        guard let transcriber else {
+            error = TranscriberError.noRecognizer
+            return
         }
-    }
-    
-    public func selectInput(_ input: AVAudioSessionPortDescription) {
-        do {
-            try AVAudioSession.sharedInstance().setPreferredInput(input)
-            if let dataSources = input.dataSources, let firstSource = dataSources.first {
-                try input.setPreferredDataSource(firstSource)
+        
+        if isRecording {
+            recordingTask?.cancel()
+            recordingTask = nil
+            Task {
+                await transcriber.stopStream()
+                isRecording = false
+                onCompleteHandler?(transcribedText)
             }
-            selectedInput = input
-        } catch {
-            print("Error selecting input: \(error.localizedDescription)")
+        } else {
+            transcribedText = "" // Reset text when starting new recording
+            recordingTask = Task {
+                do {
+                    isRecording = true
+                    let stream = try await transcriber.startStream()
+                    
+                    for try await signal in stream {
+                        switch signal {
+                        case .rms(let float):
+                            rmsLevel = float
+                        case .transcription(let string):
+                            transcribedText = string
+                        }
+                    }
+                    
+                    // Stream ended naturally (silence detected)
+                    isRecording = false
+                    onCompleteHandler?(transcribedText)
+                } catch {
+                    self.error = error
+                    isRecording = false
+                }
+            }
         }
     }
     
@@ -74,41 +103,23 @@ public class TranscriptionModel: TranscriberViewModeling {
         }
     }
     
-    public func toggleRecording() {
-        guard let transcriber else {
-            error = TranscriberError.noRecognizer
-            return
-        }
-        
-        if isRecording {
-            recordingTask?.cancel()
-            recordingTask = nil
-            isRecording = false
-            Task {
-                await transcriber.stopStream()
-                isRecording = false
-            }
-        } else {
-            recordingTask = Task {
-                do {
-                    isRecording = true
-                    let stream = try await transcriber.startStream()
-                    
-                    for try await signal in stream {
-                        switch signal {
-                            case .rms(let float):
-                                rmsLevel = float
-                            case .transcription(let string):
-                                transcribedText = string
-                        }
-                    }
-                    
-                    isRecording = false
-                } catch {
-                    self.error = error
-                    isRecording = false
-                }
-            }
+    #if os(iOS)
+    public func fetchAvailableInputs() {
+        availableInputs = AudioInputs.getAvailableInputs()
+        // Set initial selection to current input
+        if let currentInput = AVAudioSession.sharedInstance().currentRoute.inputs.first,
+           let matchingInput = availableInputs.first(where: { $0.uid == currentInput.uid }) {
+            selectedInput = matchingInput
         }
     }
+    
+    public func selectInput(_ input: AVAudioSessionPortDescription) {
+        do {
+            try AudioInputs.selectInput(input)
+            selectedInput = input
+        } catch {
+            self.error = TranscriberError.audioSessionFailure(error)
+        }
+    }
+    #endif
 }
