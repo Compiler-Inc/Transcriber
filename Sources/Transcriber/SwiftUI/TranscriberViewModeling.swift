@@ -11,7 +11,7 @@ import Foundation
 ///
 @preconcurrency
 @MainActor
-public protocol Transcribable {
+public protocol TranscriberViewModeling {
     // MARK: - Required State Properties
     
     /// Indicates whether speech recognition is currently active

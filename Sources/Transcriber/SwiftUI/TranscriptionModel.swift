@@ -6,7 +6,7 @@ import AVFoundation
 
 @Observable
 @MainActor
-public class TranscriptionModel: Transcribable {
+public class TranscriptionModel: TranscriberViewModeling {
     
     public var isRecording = false
     public var transcribedText = ""
@@ -36,8 +36,6 @@ public class TranscriptionModel: Transcribable {
                 .allowBluetoothA2DP,
                 .defaultToSpeaker
             ])
-            // Set preferred sample rate for better speech recognition
-            try session.setPreferredSampleRate(44100.0)
             // Set preferred I/O buffer duration
             try session.setPreferredIOBufferDuration(0.005)
             try session.setActive(true)
