@@ -3,6 +3,7 @@
 import Speech
 
 /// Manages custom language model preparation and configuration
+@available(iOS 17.0, *)
 public actor LanguageModelManager {
     private var hasBuiltLm = false
     private var customLmTask: Task<Void, Error>?
