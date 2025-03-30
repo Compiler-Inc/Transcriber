@@ -4,7 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "Transcriber",
-    platforms: [.macOS(.v14), .iOS(.v17), .tvOS(.v17), .visionOS(.v1)],
+    platforms: [.macOS(.v14), .iOS(.v15), .tvOS(.v15), .visionOS(.v1)],
     products: [.library(name: "Transcriber", targets: ["Transcriber"])],
     targets: [.target(name: "Transcriber")]
 )
