@@ -6,7 +6,11 @@ import SwiftUI
 struct TranscriberDemoApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if #available(iOS 17.0, *) {
+                ContentView()
+            } else {
+                LegacyContentView()
+            }
         }
     }
 }
