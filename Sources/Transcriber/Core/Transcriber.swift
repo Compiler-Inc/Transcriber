@@ -12,11 +12,6 @@ public actor Transcriber {
     private let audioEngine: AVAudioEngine
     private let logger: DebugLogger
     
-    private lazy var languageModelManager: LanguageModelManager? = {
-        guard let modelInfo = config.languageModelInfo else { return nil }
-        return LanguageModelManager(modelInfo: modelInfo)
-    }()
-    
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
     
@@ -41,7 +36,6 @@ public actor Transcriber {
         }
     }
     
-    
     // MARK: - Recognition Setup
     private func setupRecognition() throws -> SFSpeechAudioBufferRecognitionRequest {
         let request = SFSpeechAudioBufferRecognitionRequest()
@@ -49,7 +43,11 @@ public actor Transcriber {
         // Apply all configuration settings
         request.shouldReportPartialResults = config.shouldReportPartialResults
         request.requiresOnDeviceRecognition = config.requiresOnDeviceRecognition
-        request.addsPunctuation = config.addsPunctuation
+        
+        if #available(iOS 16, *) {
+            request.addsPunctuation = config.addsPunctuation
+        }
+        
         request.taskHint = config.taskHint
         
         // Only set contextual strings if provided
@@ -91,21 +89,15 @@ public actor Transcriber {
     private func startCombinedStream() async throws -> AsyncThrowingStream<String, Error> {
         logger.debug("Starting transcription stream...")
         
-        if let languageModelManager = languageModelManager {
-            try await languageModelManager.waitForModel()
-        }
-        
-        // Reset state
-        resetRecognitionState()
-        
         let localRequest = try setupRecognition()
         
-        // Configure language model if available
-        if let languageModel = languageModelManager {
-            try await languageModel.waitForModel()
-            if let lmConfig = await languageModel.getConfiguration() {
-                localRequest.requiresOnDeviceRecognition = true
-                localRequest.customizedLanguageModel = lmConfig
+        if #available(iOS 17, *) {
+            if let languageModel = configureLanguageModel() {
+                try await languageModel.waitForModel()
+                if let lmConfig = await languageModel.getConfiguration() {
+                    localRequest.requiresOnDeviceRecognition = true
+                    localRequest.customizedLanguageModel = lmConfig
+                }
             }
         }
         
@@ -143,7 +135,7 @@ public actor Transcriber {
             self.logger.debug("RMS: \(rms)")
             
             // Send RMS value to stream using local continuation
-            localRMSContinuation?.yield(rms) 
+            localRMSContinuation?.yield(rms)
             // Send RMS value to stream using local continuation
             if silenceState.update(
                 rms: rms,
@@ -294,6 +286,12 @@ public actor Transcriber {
                 }
             }
         }
+    }
+    
+    @available(iOS 17, *)
+    private func configureLanguageModel() -> LanguageModelManager? {
+        guard let modelInfo = config.languageModelInfo else { return nil }
+        return LanguageModelManager(modelInfo: modelInfo)
     }
 }
 
