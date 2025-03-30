@@ -129,13 +129,13 @@ public struct SpeechButton: View {
         .onTapGesture {
             onTap()
         }
-        .onChange(of: isRecording) { _, newIsRecording in
+        .onChange(of: isRecording) { newIsRecording in
             updateState(isRecording: newIsRecording, isProcessing: isProcessing)
         }
-        .onChange(of: isProcessing) { _, newIsProcessing in
+        .onChange(of: isProcessing) { newIsProcessing in
             updateState(isRecording: isRecording, isProcessing: newIsProcessing)
         }
-        .onChange(of: rmsValue) { _, newRMS in
+        .onChange(of: rmsValue) { newRMS in
             updateAmplitudes(with: newRMS)
         }
         .onAppear {
